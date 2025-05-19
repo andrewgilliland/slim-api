@@ -5,6 +5,6 @@ use Slim\Factory\AppFactory;
 
 $app = AppFactory::create();
 
-require __DIR__ . '/../src/routes.php';
+(require __DIR__ . '/../src/routes.php')($app);
 
 $app->run();
