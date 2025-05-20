@@ -4,9 +4,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 
 return function (App $app) {
-    $app->get('/', function (Request $request, Response $response) {
-        $response->getBody()->write("Hello, World!");
-        return $response;
+    $container = $app->getContainer();
+
+    $app->get('/', function (Request $request, Response $response, array $args) {
+        $payload = json_encode(['message' => 'Hello, World!']);
+
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
     });
     
     $app->get('/users', function (Request $request, Response $response) {
@@ -22,9 +26,18 @@ return function (App $app) {
         return $response->withHeader('Content-Type', 'application/json');
     });
     
-    $app->get('/users/{id}', function (Request $request, Response $response, array $args) {
+    $app->get('/users/{id}', function (Request $request, Response $response, array $args) use ($container) {
         $id = $args['id'];
-        $response->getBody()->write("User ID: $id");
-        return $response;
+        
+        $pdo = $container->get(PDO::class);
+
+        $stmt = $pdo->prepare("SELECT * FROM `customers` WHERE `id` = $id");
+        $stmt->execute();
+        $customer = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $payload = json_encode($customer);
+
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
     });
 };
