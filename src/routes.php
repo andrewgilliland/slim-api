@@ -13,20 +13,20 @@ return function (App $app) {
         return $response->withHeader('Content-Type', 'application/json');
     });
     
-    $app->get('/users', function (Request $request, Response $response) {
-        $users = ['Alice', 'Bob', 'Charlie'];
-        $response->getBody()->write(json_encode($users));
-        return $response->withHeader('Content-Type', 'application/json');
-    });
+    // $app->get('/users', function (Request $request, Response $response) {
+    //     $users = ['Alice', 'Bob', 'Charlie'];
+    //     $response->getBody()->write(json_encode($users));
+    //     return $response->withHeader('Content-Type', 'application/json');
+    // });
     
-    $app->post('/users', function (Request $request, Response $response) {
-        $data = $request->getParsedBody();
-        // You would save $data to the database here
-        $response->getBody()->write(json_encode(['status' => 'User created']));
-        return $response->withHeader('Content-Type', 'application/json');
-    });
+    // $app->post('/users', function (Request $request, Response $response) {
+    //     $data = $request->getParsedBody();
+    //     // You would save $data to the database here
+    //     $response->getBody()->write(json_encode(['status' => 'User created']));
+    //     return $response->withHeader('Content-Type', 'application/json');
+    // });
     
-    $app->get('/users/{id}', function (Request $request, Response $response, array $args) use ($container) {
+    $app->get('/customers/{id}', function (Request $request, Response $response, array $args) use ($container) {
         $id = $args['id'];
         
         $pdo = $container->get(PDO::class);
@@ -38,6 +38,21 @@ return function (App $app) {
         $payload = json_encode($customer);
 
         $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    });
+
+    $app->post( '/login', function ($request, $response) {
+        $data = $request->getParsedBody();
+        $username = $data['username'];
+        $password = $data['password'];
+
+        // Here you would check the credentials against your database
+        if ($username === 'admin' && $password === 'password') {
+            $response->getBody()->write(json_encode(['status' => 'Login successful']));
+        } else {
+            $response->getBody()->write(json_encode(['status' => 'Invalid credentials']));
+        }
+
         return $response->withHeader('Content-Type', 'application/json');
     });
 };
